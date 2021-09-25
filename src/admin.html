@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>College Feedback System (CFS) - Admin Page</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<body>
+    <div class="jumbotron jumbotron-fluid py-4">
+        <div class="container">
+            <h3 class="m-0"><strong>CFS Admin Area</strong></h3>
+        </div>
+    </div>
+    <div class="container">
+        <div class="btn-group w-100" role="group" aria-label="Basic example">
+            <button id="insertButton" type="button" class="btn btn-outline-primary">Insert College Details</button>
+            <button type="button" class="btn btn-outline-primary">Insert Placement Details</button>
+            <button type="button" class="btn btn-outline-primary">View All Feedbacks</button>
+            <button type="button" class="btn btn-outline-primary">View All Registered Users</button>
+            <button type="button" class="btn btn-outline-primary">Add Admin</button>
+        </div>
+        <table class="table table-hover mt-4">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Phone</th>
+                    <th scope="col">No of students</th>
+                    <th scope="col">Principal</th>
+                    <th scope="col">Founded</th>
+                    <th scope="col" class="text-uppercase">Update</th>
+                    <th scope="col" class="text-uppercase">Delete</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyMain">
+            </tbody>
+        </table>
+    </div>
+    <script>
+    var mysql = require('mysql');
+    const electron = require('electron')
+    const ipc = electron.ipcRenderer
+
+    var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: null,
+        database: "cfs"
+    });
+
+    con.connect(function(err) {
+        if (err) throw err
+        console.log("Mysql connected successfully");
+    });
+
+    let sql = "SELECT * FROM college"
+
+    con.query(sql, function(err, result, fields) {
+        if (err) throw err;
+        let tableContent = ``;
+        result.forEach((res, index) => {
+            tableContent += `<tr>
+                    <th scope="row">${res.id}</th>
+                    <td>${res.name}</td>
+                    <td>${res.description}</td>
+                    <td>${res.address}</td>
+                    <td>${res.phone}</td>
+                    <td>${res.students}</td>
+                    <td>${res.principal}</td>
+                    <td>${res.founded}</td>
+                    <td>
+                    <button onclick="updateCollege(this)" class="btn btn-link text-uppercase" data-id="${res.id}">Update</button>
+                    </td> <td>
+                    <button onclick="deleteCollege(this)" class="btn btn-link text-uppercase" data-id="${res.id}">Delete</button>
+                    </td>
+                </tr>`
+        });
+        document.getElementById('tbodyMain').innerHTML = tableContent;
+    });
+
+    document.getElementById('insertButton').addEventListener('click', () => {
+        ipc.send('open:window', 'insert');
+    });
+
+    function deleteCollege(collegeButton) {
+        var collegeID = collegeButton.getAttribute("data-id");
+        console.log(collegeID)
+        let sql = "DELETE FROM college WHERE id=" + collegeID + ";";
+        con.query(sql, function(err, result, fields) {
+            if (err) throw err;
+            ipc.send('refresh:window', 'admin');
+        });
+    }
+
+    function updateCollege(collegeButton) {
+        var collegeID = collegeButton.getAttribute("data-id");
+        ipc.send('update:window', collegeID);
+    }
+    </script>
+</body>
+
+</html>

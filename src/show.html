@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>College Feedback System (CFS) - Show All Colleges</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<body>
+    <div class="jumbotron jumbotron-fluid py-4">
+        <div class="container-fluid">
+            <h5 class="m-0 text-center"><strong>List of Colleges</strong></h5>
+        </div>
+    </div>
+    <div id="tbodyMain" class="px-3"></div>
+    <script>
+    var mysql = require('mysql');
+
+    const electron = require('electron')
+    const ipc = electron.ipcRenderer
+
+    var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: null,
+        database: "cfs"
+    });
+
+    con.connect(function(err) {
+        if (err) throw err
+        console.log("Mysql connected successfully");
+    });
+
+    let sql = "SELECT * FROM college"
+
+    con.query(sql, function(err, result, fields) {
+        if (err) throw err;
+        let tableContent = ``;
+        result.forEach((res, index) => {
+
+            tableContent += `<div class="card mb-2">
+                    <div class="card-body">
+                        <h5 class="card-title"><strong>${res.name}</strong></h5>
+                        <p class="card-text">${res.description}</p>
+                        <a href="#" class="card-link text-uppercase" onclick="showDetails(this)" data-id="${res.id}">Show details</a>
+                        <a href="#" class="card-link text-uppercase" onclick="openFeedback(this)" data-id="${res.id}">Give Feedback</a>
+                    </div>
+                </div>`
+        });
+        document.getElementById('tbodyMain').innerHTML = tableContent;
+    });
+
+    function showDetails(collegeButton) {
+        var collegeID = collegeButton.getAttribute("data-id");
+        ipc.send('details:window', collegeID);
+    }
+
+    function openFeedback(collegeButton) {
+        var collegeID = collegeButton.getAttribute("data-id");
+        ipc.send('feedback:window', collegeID);
+    }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>College Feedback System (CFS) - Update College</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<body id="tbodyMain">
+    <div class="jumbotron jumbotron-fluid py-4">
+        <div class="container-fluid">
+            <h5 class="m-0 text-center">Update Details - <strong id="collegeName"></strong></h5>
+        </div>
+    </div>
+    <form id="updateForm" action="" class="px-3 mt-5">
+        <input type="hidden" name="id" id="inputId">
+        <div class="form-group">
+            <label for="exampleFormControlInput1">College Name</label>
+            <input id="inputName" name="name" type="text" class="form-control" id="exampleFormControlInput1">
+        </div>
+        <div class="form-group">
+            <label for="exampleFormControlTextarea1">Description</label>
+            <textarea id="inputDescription" name="description" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="exampleFormControlTextarea1">Address</label>
+            <textarea id="inputAddress" name="address" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="exampleFormControlInput1">Phone</label>
+            <input id="inputPhone" name="phone" type="number" class="form-control" id="exampleFormControlInput1">
+        </div>
+        <div class="form-group">
+            <label for="exampleFormControlInput1">No of students</label>
+            <input id="inputStudents" name="students" type="number" class="form-control" id="exampleFormControlInput1">
+        </div>
+        <div class="form-group">
+            <label for="exampleFormControlInput1">Principal</label>
+            <input id="inputPrincipal" name="principal" type="text" class="form-control" id="exampleFormControlInput1">
+        </div>
+        <div class="form-group mb-4">
+            <label for="exampleFormControlInput1">Founded</label>
+            <input id="inputFounded" name="founded" type="number" class="form-control" id="exampleFormControlInput1">
+        </div>
+        <button type="submit" class="btn btn-block btn-primary mt-4">Update College</button>
+    </form>
+    <script>
+    var mysql = require('mysql');
+    const { remote } = require('electron');
+
+    const electron = require('electron')
+    const ipc = electron.ipcRenderer
+
+    const currentID = remote.getCurrentWindow().currentId;
+
+    let inputName = document.getElementById('inputName');
+    let inputDescription = document.getElementById('inputDescription');
+    let inputAddress = document.getElementById('inputAddress');
+    let inputPhone = document.getElementById('inputPhone');
+    let inputStudents = document.getElementById('inputStudents');
+    let inputPrincipal = document.getElementById('inputPrincipal');
+    let inputFounded = document.getElementById('inputFounded');
+    let inputId = document.getElementById('inputId');
+    let collegeName = document.getElementById('collegeName')
+
+    var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: null,
+        database: "cfs"
+    });
+
+    con.connect(function(err) {
+        if (err) throw err
+        console.log("Mysql connected successfully");
+    });
+
+    document.getElementById('updateForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        let name = e.target.name.value;
+        let description = e.target.description.value;
+        let address = e.target.address.value;
+        let phone = e.target.phone.value;
+        let students = e.target.students.value;
+        let principal = e.target.principal.value;
+        let founded = e.target.founded.value;
+        let id = e.target.id.value;
+
+        let sql = "UPDATE `college` SET name='" + name + "', description='" + description + "', address='" + address + "', phone='" + phone + "', students='" + students + "', principal='" + principal + "', founded='" + founded + "'WHERE id=" + id + ";"
+
+        con.query(sql, function(err, result, fields) {
+            if (err) throw err;
+            ipc.send('refresh:window', 'admin');
+            var window = remote.getCurrentWindow();
+            window.close();
+        });
+    })
+
+    let sql = "SELECT * FROM college WHERE id=" + currentID + ";";
+    con.query(sql, function(err, result, fields) {
+        if (err) throw err;
+        console.log(result[0]);
+
+        let current_name = result[0].name;
+        let current_id = result[0].id;
+        let current_description = result[0].description;
+        let current_address = result[0].address;
+        let current_phone = result[0].phone;
+        let current_students = result[0].students;
+        let current_principal = result[0].principal;
+        let current_founded = result[0].founded;
+
+        inputName.value = current_name;
+        inputDescription.value = current_description;
+        inputAddress.value = current_address;
+        inputPhone.value = current_phone;
+        inputStudents.value = current_students;
+        inputPrincipal.value = current_principal;
+        inputFounded.value = current_founded;
+        inputId.value = current_id;
+        collegeName.innerHTML = current_name;
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>College Feedback System (CFS) - Main Page</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h2 class="pb-2"><strong>College Feedback System (CFS)</strong></h2>
+            <p class="lead">College feedback system is a web application which provides an easy way to know information about a college. In this application, all the information of the college will be added by admin. Students can find all the details of college and can give feedback which will be helpful to fresher’s who are searching for college information.
+            </p>
+            <button class="btn btn-primary">Learn More</button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-3">
+                <ul class="list-group text-center">
+                    <li class="list-group-item">
+                        <button id="loginButton" type="button" class="btn btn-link text-uppercase">Login to Admin Interface</button>
+                    </li>
+                    <li class="list-group-item">
+                        <button id="showButton" type="button" class="btn btn-link text-uppercase">Show all colleges</button>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-9">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><strong>Existing System</strong></h5>
+                        <p class="card-text">In the existing system, there is no proper information about colleges. Students who are searching for college details should go physically and make enquire about college which takes a lot of time and effort. The student is not able to give feedback about college.
+                        </p>
+                    </div>
+                </div>
+                <div class="card mt-2">
+                    <div class="card-body">
+                        <h5 class="card-title"><strong>Proposed System</strong></h5>
+                        <p class="card-text">The proposed system provides an easy way to a student who is searching for college information. All the information is added by admin where students and fresher’s can easily access the information. This system saves a lot of time and effort of students. This system also provides a chance for students to give feedback about the college.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script>
+    const electron = require('electron')
+    const ipc = electron.ipcRenderer
+
+    document.getElementById('loginButton').addEventListener('click', () => {
+        ipc.send('open:window', 'login');
+    });
+
+    document.getElementById('showButton').addEventListener('click', () => {
+        ipc.send('open:window', 'show-college');
+    });
+    </script>
+</body>
+
+</html>

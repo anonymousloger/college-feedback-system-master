@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>College Feedback System (CFS) - Feedback</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<body id="tbodyMain">
+    <div class="jumbotron jumbotron-fluid py-4">
+        <div class="container-fluid">
+            <h5 class="m-0 text-center"><strong>Give a Feedback</strong></h5>
+        </div>
+    </div>
+    <form id="insertForm" action="" class="px-3 mt-5">
+        <div class="form-group">
+            <label for="exampleFormControlInput1">Name</label>
+            <input name="name" type="text" class="form-control" id="exampleFormControlInput1">
+        </div>
+        <div class="form-group">
+            <label for="exampleFormControlTextarea1">Content</label>
+            <textarea name="content" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-block btn-primary mt-4">Submit Feedback</button>
+    </form>
+    <script>
+    const { remote } = require('electron');
+    var mysql = require('mysql');
+
+    const currentID = remote.getCurrentWindow().currentId;
+    console.log(currentID);
+
+    var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: null,
+        database: "cfs"
+    });
+
+    con.connect(function(err) {
+        if (err) throw err
+        console.log("Mysql connected successfully");
+    });
+
+    document.getElementById('insertForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        let name = e.target.name.value;
+        let content = e.target.content.value;
+
+
+        let sql = "INSERT INTO `feedback` (`id`, `name`, `content`, `college_id`) VALUES (NULL, '" + name + "', '" + content + "', " + currentID + ");"
+
+        con.query(sql, function(err, result, fields) {
+            if (err) throw err;
+            var window = remote.getCurrentWindow();
+            window.close();
+        });
+    })
+    </script>
+</body>
+
+</html>

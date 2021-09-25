@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>College Feedback System (CFS) - Details Page</title>
+    <link rel="stylesheet" href="../assets/style.css">
+</head>
+
+<body>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h2><strong id="name"></strong></h2>
+            <p class="lead" id="description"></p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                <h5><strong>More Info</strong></h5>
+                <hr>
+                <div class="card" style="line-height: 30px">
+                    <div class="card-body">
+                        <div>
+                            <strong>Address</strong>: <span id="address"></span>
+                        </div>
+                        <div>
+                            <strong>Phone</strong>: <span id="phone"></span>
+                        </div>
+                        <div>
+                            <strong>No of students</strong>: <span id="students"></span>
+                        </div>
+                        <div>
+                            <strong>Principal</strong>: <span id="principal"></span>
+                        </div>
+                        <div>
+                            <strong>Founded</strong>: <span id="founded"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <h5><strong>Feedbacks</strong></h5>
+                <hr>
+                <div id="feedback">
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    var mysql = require('mysql');
+    const { remote } = require('electron');
+
+    const currentID = remote.getCurrentWindow().currentId;
+    console.log(currentID);
+
+    var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: null,
+        database: "cfs"
+    });
+
+    con.connect(function(err) {
+        if (err) throw err
+        console.log("Mysql connected successfully");
+    });
+
+    let sql = "SELECT * FROM college WHERE id=" + currentID + ";";
+    con.query(sql, function(err, result, fields) {
+        if (err) throw err;
+        console.log(result[0]);
+
+        let current_name = result[0].name;
+        let current_id = result[0].id;
+        let current_description = result[0].description;
+        let current_address = result[0].address;
+        let current_phone = result[0].phone;
+        let current_students = result[0].students;
+        let current_principal = result[0].principal;
+        let current_founded = result[0].founded;
+
+        document.getElementById('name').innerHTML = current_name;
+        document.getElementById('description').innerHTML = current_description;
+        document.getElementById('address').innerHTML = current_address;
+        document.getElementById('phone').innerHTML = current_phone;
+        document.getElementById('students').innerHTML = current_students;
+        document.getElementById('principal').innerHTML = current_principal;
+        document.getElementById('founded').innerHTML = current_founded;
+
+    });
+    sql = "SELECT * FROM feedback WHERE college_id=" + currentID + ";";
+    con.query(sql, function(err, result, fields) {
+        let feedbacks = ``;
+        result.forEach((item, index) => {
+            feedbacks += `<div class="card mb-2">
+                        <div class="card-body">
+                            <div class="media">
+                                <div class="media-body">
+                                    <h5 class="mt-0"><strong>${item.name}</strong></h5>
+                                    ${item.content}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+        });
+        document.getElementById('feedback').innerHTML = feedbacks;
+    });
+    </script>
+</body>
+
+</html>
